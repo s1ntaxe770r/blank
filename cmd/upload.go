@@ -44,11 +44,11 @@ var uploadcmd = &cobra.Command{
 			fmt.Println(color.RedString(URL_ERROR))
 			os.Exit(1)
 		}
-		file, err := os.Open(args[0])
-		if err != nil {
-			fmt.Printf("could not open file %v. Reason %s", file.Name(), err.Error())
-			os.Exit(1)
-		}
+		file := args[0]
+		// if err != nil {
+		// 	fmt.Printf("could not open file %v. Reason %s", file.Name(), err.Error())
+		// 	os.Exit(1)
+		// }
 		_, credentials := GetCreds()
 		fmt.Println(color.YellowString("attempting to upload file"))
 		s.Start()
