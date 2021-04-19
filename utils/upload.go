@@ -1,53 +1,71 @@
 package utils
 
 import (
+	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/fatih/color"
-	"github.com/sirupsen/logrus"
 )
 
 type Undelivered struct {
-	Status string `json:"Status"`
-	Err    error  `json:"Err"`
+	Status string `json:"status"`
+	Err    error  `json:"err"`
 }
 
 type Parcel struct {
-	Status string `json:"Status"`
-	URL    string `json:"URL"`
+	Status string `json:"status"`
+	URL    string `json:"url"`
 }
 
-func UploadFile(file *os.File, url string, creds Credentials) error {
-	client := &http.Client{}
-	req, err := http.NewRequest("POST", url+"/push", file)
-	if err != nil {
-		panic("PANICED AT REQUEST")
-		return errors.New(color.RedString("unable to make http request, ") + err.Error())
-	}
-	// req.SetBasicAuth(creds.Username, creds.Password)
-	resp, err := client.Do(req)
-	switch {
-	case resp.StatusCode == http.StatusRequestEntityTooLarge:
+func UploadFile(filename string, server string, creds Credentials) (error, string) {
 
-		return errors.New(color.RedString("File size exceeds limit"))
-	case resp.StatusCode == http.StatusBadRequest:
-		errmessage := Undelivered{}
-		json.NewDecoder(resp.Body).Decode(&errmessage)
-		return errors.New(errmessage.Err.Error())
-	case resp.StatusCode == http.StatusOK:
-		file := Parcel{}
-		json.NewDecoder(resp.Body).Decode(&file)
-		logrus.Warn("HIIIIII")
-		imageurl := fmt.Sprintf("http://%s", file.URL)
-		fmt.Println(color.GreenString(imageurl))
-		return nil
-	}
+	//Open file
+	file, err := os.Open(filename)
+	defer file.Close()
 	if err != nil {
-		return err
+		fmt.Println(color.RedString(err.Error()))
+		os.Exit(1)
 	}
-	return nil
+
+	// prepare request
+	bodyBuf := &bytes.Buffer{}
+	bodyWriter := multipart.NewWriter(bodyBuf)
+
+	// this step is very important
+	fileWriter, err := bodyWriter.CreateFormFile("file", filename)
+	if err != nil {
+		return err, "error writing to buffer"
+	}
+
+	// open file handle
+	fh, err := os.Open(filename)
+	if err != nil {
+		return err, " "
+	}
+
+	//iocopy
+	_, err = io.Copy(fileWriter, fh)
+	if err != nil {
+		return err, " "
+	}
+
+	contentType := bodyWriter.FormDataContentType()
+	bodyWriter.Close()
+
+	resp, err := http.Post(server+"/push", contentType, bodyBuf)
+	if err != nil {
+		return err, ""
+	}
+	defer resp.Body.Close()
+	var uploadedfile Parcel
+	json.NewDecoder(resp.Body).Decode(&uploadedfile)
+	parsedurl, _ := url.Parse(server)
+	filelocation := parsedurl.Scheme + "://" + uploadedfile.URL
+	return nil, filelocation
 }
