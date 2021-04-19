@@ -52,14 +52,14 @@ var uploadcmd = &cobra.Command{
 		_, credentials := GetCreds()
 		fmt.Println(color.YellowString("attempting to upload file"))
 		s.Start()
-		uploaderr := utils.UploadFile(file, blink_server, credentials)
+		uploaderr, filelocation := utils.UploadFile(file, blink_server, credentials)
 		if uploaderr != nil {
 			fmt.Println(uploaderr.Error())
 			s.Stop()
 			os.Exit(1)
 		}
 		s.Stop()
-		fmt.Println(color.HiGreenString("upload successfull. File url has been copied to your clipboard"))
+		fmt.Println(color.GreenString(filelocation))
 		os.Exit(0)
 	},
 }
