@@ -1,5 +1,5 @@
 build:
-	go build -o blank 
+	rm ./blank && go build -o blank 
 
 run:
 	go run main.go 

@@ -50,8 +50,8 @@ var uploadcmd = &cobra.Command{
 		// 	os.Exit(1)
 		// }
 		_, credentials := GetCreds()
-		fmt.Println(color.YellowString("attempting to upload file"))
 		s.Start()
+		fmt.Println(color.YellowString("attempting to upload file"))
 		uploaderr, filelocation := utils.UploadFile(file, blink_server, credentials)
 		if uploaderr != nil {
 			fmt.Println(uploaderr.Error())
@@ -59,7 +59,7 @@ var uploadcmd = &cobra.Command{
 			os.Exit(1)
 		}
 		s.Stop()
-		fmt.Printf("your file now lives at %s", color.GreenString(filelocation))
+		fmt.Println("your file now lives at " + color.GreenString(filelocation))
 		os.Exit(0)
 	},
 }
