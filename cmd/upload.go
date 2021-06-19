@@ -14,7 +14,7 @@ import (
 const URL_ERROR = `
 Could not find server to upload file to. Consider setting exporting your blink server address to an environment variable
 
-EG: export BLINK_SERVER = https://yourblinkserveraddress.file
+EG: export BLINK_SERVER = https://yourblinkserveraddress.com
 `
 
 func init() {
@@ -59,7 +59,7 @@ var uploadcmd = &cobra.Command{
 			os.Exit(1)
 		}
 		s.Stop()
-		fmt.Println(color.GreenString(filelocation))
+		fmt.Printf("your file now lives at %s", color.GreenString(filelocation))
 		os.Exit(0)
 	},
 }
