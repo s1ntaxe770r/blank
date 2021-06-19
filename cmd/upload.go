@@ -7,7 +7,7 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
-	"github.com/s1ntaxe770r/blank/blank/utils"
+	"github.com/s1ntaxe770r/blank/utils"
 	"github.com/spf13/cobra"
 )
 
