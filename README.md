@@ -12,3 +12,5 @@ Blank is a commandline client for [Blink](https://github.com/s1ntaxe770r/blink)
 
 
 ### Installation
+
+Grab a binary from the [releases](https://github.com/s1ntaxe770r/blank/releases/) tab and unzip and move to your path
